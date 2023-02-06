@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContextProvider';
+import Loader from '../Loader/Loader';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { handleLogin, error } = useAuth();
+  const { handleLogin, error, setError, loading } = useAuth();
 
   function handleSave(e) {
     e.preventDefault();
@@ -17,6 +18,14 @@ const Login = () => {
       formData.append('password', password);
       handleLogin(formData, email);
     }
+  }
+
+  useEffect(() => {
+    setError(false);
+  }, []);
+
+  if (loading) {
+    return <Loader />;
   }
 
   return (

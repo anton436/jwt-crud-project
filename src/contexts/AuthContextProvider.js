@@ -42,7 +42,57 @@ const AuthContextProvider = ({ children }) => {
     }
   };
 
-  const values = { handleRegister, handleLogin, error, user };
+  const checkAuth = async () => {
+    setLoading(true);
+
+    try {
+      const tokens = JSON.parse(localStorage.getItem('tokens'));
+      const Authorization = `Bearer ${tokens.access}`;
+
+      const config = {
+        headers: {
+          Authorization,
+        },
+      };
+
+      const res = await axios.post(`${API}/account/token/refresh/`, {
+        refresh: tokens.refresh,
+        config,
+      });
+      localStorage.setItem(
+        'tokens',
+        JSON.stringify({
+          access: res.data.access,
+          refresh: tokens.refresh,
+        })
+      );
+      const email = localStorage.getItem('email');
+      setUser(email);
+    } catch (error) {
+      console.log(error);
+      handleLogout();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('tokens');
+    localStorage.removeItem('email');
+    setUser(false);
+    navigate('/login');
+  };
+
+  const values = {
+    handleRegister,
+    handleLogin,
+    error,
+    user,
+    checkAuth,
+    setError,
+    loading,
+    handleLogout,
+  };
   return <authContext.Provider value={values}>{children}</authContext.Provider>;
 };
 

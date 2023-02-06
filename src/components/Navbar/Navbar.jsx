@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
@@ -5,9 +6,18 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContextProvider';
 
 function NavScrollExample() {
   const navigate = useNavigate();
+  const { user, handleLogout, checkAuth } = useAuth();
+
+  useEffect(() => {
+    if (localStorage.getItem('tokens')) {
+      checkAuth();
+    }
+  }, []);
+
   return (
     <Navbar bg='light' expand='lg'>
       <Container fluid>
@@ -27,10 +37,10 @@ function NavScrollExample() {
               <NavDropdown.Item onClick={() => navigate('/login')}>
                 Login
               </NavDropdown.Item>
-              <NavDropdown.Item href='#action4'>Logout</NavDropdown.Item>
+              <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link href='#' disabled>
-              Link
+              {user ? user : 'No auth user'}
             </Nav.Link>
           </Nav>
           <Form className='d-flex'>
