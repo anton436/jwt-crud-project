@@ -6,12 +6,17 @@ export const useProducts = () => useContext(productContext);
 
 const INIT_STATE = {
   products: [],
+  pages: 0,
 };
 
 function reducer(state = INIT_STATE, action) {
   switch (action.type) {
     case 'GET_PRODUCTS':
-      return { ...state, products: action.payload };
+      return {
+        ...state,
+        products: action.payload.results,
+        pages: Math.ceil(action.payload.count / 6),
+      };
     default:
       return state;
   }
@@ -33,20 +38,19 @@ const ProductContextProvider = ({ children }) => {
         },
       };
 
-      const res = await axios.get(`${API}/products/`, config);
+      console.log(window);
+      const res = await axios.get(
+        `${API}/products/${window.location.search}`,
+        config
+      );
 
-      dispatch({ type: 'GET_PRODUCTS', payload: res.data.results });
+      dispatch({ type: 'GET_PRODUCTS', payload: res.data });
     } catch (error) {
       console.log(error);
     }
   };
 
-  console.log(state);
-  useEffect(() => {
-    getProducts();
-  }, []);
-
-  const values = { getProducts };
+  const values = { getProducts, products: state.products, pages: state.pages };
   return (
     <productContext.Provider value={values}>{children}</productContext.Provider>
   );
