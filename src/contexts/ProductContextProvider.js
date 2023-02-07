@@ -7,6 +7,7 @@ export const useProducts = () => useContext(productContext);
 const INIT_STATE = {
   products: [],
   pages: 0,
+  categories: [],
 };
 
 function reducer(state = INIT_STATE, action) {
@@ -17,6 +18,9 @@ function reducer(state = INIT_STATE, action) {
         products: action.payload.results,
         pages: Math.ceil(action.payload.count / 6),
       };
+
+    case 'GET_CATEGORIES':
+      return { ...state, categories: action.payload };
     default:
       return state;
   }
@@ -50,7 +54,28 @@ const ProductContextProvider = ({ children }) => {
     }
   };
 
-  const values = { getProducts, products: state.products, pages: state.pages };
+  const getCategories = async () => {
+    try {
+      const tokens = JSON.parse(localStorage.getItem('tokens'));
+      const Authorization = `Bearer ${tokens.access}`;
+
+      const config = {
+        headers: {
+          Authorization,
+        },
+      };
+
+      const res = await axios.get(`${API}/category/list/`, config);
+      console.log(res);
+    } catch (error) {}
+  };
+
+  const values = {
+    getProducts,
+    products: state.products,
+    pages: state.pages,
+    getCategories,
+  };
   return (
     <productContext.Provider value={values}>{children}</productContext.Provider>
   );

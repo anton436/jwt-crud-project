@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useProducts } from '../../contexts/ProductContextProvider';
 
 const AddProduct = () => {
+  const { getCategories } = useProducts();
+
+  useEffect(() => {
+    getCategories();
+  }, []);
   return (
     <div className='d-flex flex-column w-50 m-auto'>
       <h1>Add product</h1>
